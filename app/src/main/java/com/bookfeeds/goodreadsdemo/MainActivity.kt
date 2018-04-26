@@ -9,9 +9,6 @@ import com.bookfeeds.goodreadsdemo.dagger.AppComponent
 import com.bookfeeds.goodreadsdemo.event.OAuthVerifierFetchedEvent
 import com.bookfeeds.goodreadsdemo.login.LogInController
 import oauth.signpost.OAuth
-import retrofit.Callback
-import retrofit.RetrofitError
-import retrofit.client.Response
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -2,6 +2,7 @@ package com.bookfeeds.goodreadsdemo.retrofit;
 
 import oauth.signpost.AbstractOAuthConsumer;
 import oauth.signpost.http.HttpRequest;
+import okhttp3.Request;
 import retrofit.client.Request;
 
 public class RetrofitHttpOAuthConsumer extends AbstractOAuthConsumer {

@@ -10,6 +10,7 @@ import com.bookfeeds.goodreadsdemo.retrofit.RetrofitHttpOAuthConsumer;
 import com.bookfeeds.goodreadsdemo.retrofit.SigningOkClient;
 import com.bookfeeds.goodreadsdemo.session.SessionStore;
 
+import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
 import javax.inject.Singleton;
@@ -17,8 +18,9 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import oauth.signpost.OAuthConsumer;
-import retrofit.RestAdapter;
-import retrofit.converter.SimpleXMLConverter;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 @Module
 public class GoodReadsModule {
@@ -36,25 +38,32 @@ public class GoodReadsModule {
 
     @Provides
     @Singleton
-    RestAdapter provideRestAdapter(SessionStore sessionStore) {
-        OAuthConsumer consumer = sessionStore.getSession().getConsumer();
-
-        RetrofitHttpOAuthConsumer c = new RetrofitHttpOAuthConsumer(consumer.getConsumerKey(), consumer.getConsumerSecret());
-        c.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://www.goodreads.com")
-                .setConverter(new SimpleXMLConverter(new Persister()))
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setClient(new SigningOkClient(c))
-                .build();
-
-        return restAdapter;
+    public HttpLoggingInterceptor provideLoggingInterceptor() {
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        return loggingInterceptor;
     }
 
     @Provides
     @Singleton
-    GoodReadsService provideGoodReadsService(RestAdapter restAdapter) {
-        GoodReadsService service = restAdapter.create(GoodReadsService.class);
-        return service;
+    Retrofit provideRestAdapter(SessionStore sessionStore) {
+        OAuthConsumer consumer = sessionStore.getSession().getConsumer();
+
+        RetrofitHttpOAuthConsumer c = new RetrofitHttpOAuthConsumer(consumer.getConsumerKey(), consumer.getConsumerSecret());
+        c.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
+        return new Retrofit.Builder()
+                .baseUrl("https://www.goodreads.com")
+                .addConverterFactory(SimpleXmlConverterFactory.createNonStrict(
+                        new Persister(new AnnotationStrategy() // important part!
+                        )
+                ))
+                .client(new SigningOkClient(c))
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    GoodReadsService provideGoodReadsService(Retrofit restAdapter) {
+        return restAdapter.create(GoodReadsService.class);
     }
 }

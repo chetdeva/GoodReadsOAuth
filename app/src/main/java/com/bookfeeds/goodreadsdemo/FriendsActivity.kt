@@ -1,13 +1,13 @@
 package com.bookfeeds.goodreadsdemo
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.bookfeeds.goodreadsdemo.dagger.AppComponent
 import com.bookfeeds.goodreadsdemo.model.RecentUpdatesResponse
-import retrofit.Callback
-import retrofit.RetrofitError
-import retrofit.client.Response
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,13 +27,13 @@ class FriendsActivity : AppCompatActivity() {
     }
 
     fun onFriendsClick(view: View) {
-        goodReadsService.getRecentUpdates(object : Callback<RecentUpdatesResponse> {
-            override fun success(t: RecentUpdatesResponse?, response: Response?) {
-                Timber.d("getRecentUpdates success $t")
+        goodReadsService.recentUpdates().enqueue(object : Callback<RecentUpdatesResponse> {
+            override fun onFailure(call: Call<RecentUpdatesResponse>?, t: Throwable?) {
+                Timber.d("onFailure ${t?.message}")
             }
 
-            override fun failure(error: RetrofitError?) {
-                Timber.e("getRecentUpdates failure $error")
+            override fun onResponse(call: Call<RecentUpdatesResponse>?, response: Response<RecentUpdatesResponse>?) {
+                Timber.d("onResponse ${response?.body()}")
             }
         })
     }

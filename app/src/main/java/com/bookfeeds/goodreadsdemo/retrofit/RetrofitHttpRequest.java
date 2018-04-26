@@ -8,6 +8,7 @@ import java.util.Map;
 
 import oauth.signpost.http.HttpRequest;
 
+import okhttp3.Request;
 import retrofit.client.Header;
 import retrofit.client.Request;
 

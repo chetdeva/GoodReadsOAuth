@@ -1,12 +1,10 @@
 package com.bookfeeds.goodreadsdemo.retrofit;
 
-import java.io.IOException;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
-import retrofit.client.OkClient;
-import retrofit.client.Request;
-import retrofit.client.Response;
-
-public class SigningOkClient extends OkClient {
+public class SigningOkClient extends OkHttpClient {
     private final RetrofitHttpOAuthConsumer oauthConsumer;
 
     public SigningOkClient(RetrofitHttpOAuthConsumer oauthConsumer) {
@@ -14,14 +12,15 @@ public class SigningOkClient extends OkClient {
     }
 
     @Override
-    public Response execute(Request request) throws IOException {
+    public Call newCall(Request request) {
         try {
             RetrofitHttpRequest signedRetrofitHttpRequest = (RetrofitHttpRequest) oauthConsumer.sign(request);
             request = (Request) signedRetrofitHttpRequest.unwrap();
         } catch (Exception e) {
-            throw new IOException(e);
+//            throw new IOException(e);
+            e.printStackTrace();
         }
 
-        return super.execute(request);
+        return super.newCall(request);
     }
 }
