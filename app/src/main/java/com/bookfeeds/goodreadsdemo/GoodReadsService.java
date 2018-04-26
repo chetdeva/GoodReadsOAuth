@@ -9,7 +9,7 @@ import retrofit.http.Query;
 public interface GoodReadsService {
 
     @GET("/updates/friends.xml")
-    void getRecentUpdates(Callback<RecentUpdatesResponse> cb);
+    void recentUpdates(Callback<RecentUpdatesResponse> cb);
 
     @GET("/shelf/list.xml")
     void getShelves(@Query("key") String key, Callback<Object> cb);

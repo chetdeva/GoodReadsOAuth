@@ -27,7 +27,7 @@ class FriendsActivity : AppCompatActivity() {
     }
 
     fun onFriendsClick(view: View) {
-        goodReadsService.getRecentUpdates(object : Callback<RecentUpdatesResponse> {
+        goodReadsService.recentUpdates(object : Callback<RecentUpdatesResponse> {
             override fun success(t: RecentUpdatesResponse?, response: Response?) {
                 Timber.d("getRecentUpdates success $t")
             }

@@ -43,7 +43,7 @@ public class GoodReadsModule {
         RetrofitHttpOAuthConsumer c = new RetrofitHttpOAuthConsumer(consumer.getConsumerKey(), consumer.getConsumerSecret());
         c.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
         RestAdapter restAdapter = new RestAdapter.Builder()
-                .setServer("https://www.goodreads.com")
+                .setEndpoint("https://www.goodreads.com")
                 .setConverter(new SimpleXMLConverter(new Persister()))
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setClient(new SigningOkClient(c))
