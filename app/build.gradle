@@ -29,6 +29,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'oauth.signpost:signpost-core:1.2.1.2'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     implementation 'com.squareup.retrofit2:converter-jaxb:2.4.0'
     implementation ('com.squareup.retrofit2:converter-simplexml:2.4.0') {

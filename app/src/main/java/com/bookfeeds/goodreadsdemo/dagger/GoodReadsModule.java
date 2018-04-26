@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.bookfeeds.goodreadsdemo.GoodReadsService;
-import com.bookfeeds.goodreadsdemo.retrofit.RetrofitHttpOAuthConsumer;
-import com.bookfeeds.goodreadsdemo.retrofit.SigningOkClient;
 import com.bookfeeds.goodreadsdemo.session.SessionStore;
+import com.bookfeeds.goodreadsdemo.signpost.OkHttpOAuthConsumer;
+import com.bookfeeds.goodreadsdemo.signpost.SigningInterceptor;
 
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -18,6 +18,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import oauth.signpost.OAuthConsumer;
+import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
@@ -46,18 +47,29 @@ public class GoodReadsModule {
 
     @Provides
     @Singleton
-    Retrofit provideRestAdapter(SessionStore sessionStore) {
-        OAuthConsumer consumer = sessionStore.getSession().getConsumer();
+    Retrofit provideRestAdapter(HttpLoggingInterceptor loggingInterceptor, SessionStore sessionStore) {
 
-        RetrofitHttpOAuthConsumer c = new RetrofitHttpOAuthConsumer(consumer.getConsumerKey(), consumer.getConsumerSecret());
-        c.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
+        OAuthConsumer consumer = sessionStore.getSession().getConsumer();
+        String token = consumer.getToken();
+        String secret = consumer.getConsumerSecret();
+
+        OkHttpOAuthConsumer c = new OkHttpOAuthConsumer(consumer.getConsumerKey(), consumer.getConsumerSecret());
+        c.setTokenWithSecret(token, secret);
+
+//        RetrofitHttpOAuthConsumer c = new RetrofitHttpOAuthConsumer(consumer.getConsumerKey(), consumer.getConsumerSecret());
+//        c.setTokenWithSecret(consumer.getToken(), consumer.getTokenSecret());
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new SigningInterceptor(c))
+                .addInterceptor(loggingInterceptor)
+                .build();
+
         return new Retrofit.Builder()
                 .baseUrl("https://www.goodreads.com")
                 .addConverterFactory(SimpleXmlConverterFactory.createNonStrict(
                         new Persister(new AnnotationStrategy() // important part!
                         )
                 ))
-                .client(new SigningOkClient(c))
+                .client(client)
                 .build();
     }
 
